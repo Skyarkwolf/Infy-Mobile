@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<link href="bootstrap.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="angular.js"></script>
+<script >
+var app=angular.module("Application",[]);
+app.controller("myctrl",function($scope){
+	$scope.regform={};
+	$scope.map={"mys":"Mysore","bglr":"Bangalore","chn":"Chennai"}
+	$scope.brand	 = [];
+	$scope.price	 = [];
+	$scope.rom	 = [];
+	
+	
+	
+	
+	$scope.mobilemap =	[{"PRODUCT_ID":"1000",
+						  "PRODUCT_NAME":"IPHONE 6",
+						  "PRODUCT_CATEGORY":"MOBILE",
+						  "PRODUCT_BRAND":"Apple",
+						  "PRODUCT_COST":"52599.00",
+						   "PRODUCT_QUANTITY":"5",
+						   "PRODUCT_DISCOUNT":"10",
+						   "PRODUCT_SELLINGPRICE":"21999.00",
+						   "PRODUCT_SPECIFICATION":"Color:Space Gray; ROM:16 GB; Battery:1810; Primary Camera:8",
+						   "PRODUCT_SUPPLIER_ID":"S101"},
+						   
+						  { "PRODUCT_ID":"1000",
+							  "PRODUCT_NAME":"IPHONE 6",
+							  "PRODUCT_CATEGORY":"MOBILE",
+							  "PRODUCT_BRAND":"SAMSUNG",
+							  "PRODUCT_COST":"2599.00",
+							   "PRODUCT_QUANTITY":"5",
+							   "PRODUCT_DISCOUNT":"10",
+							   "PRODUCT_SELLINGPRICE":"54599.00",
+							   "PRODUCT_SPECIFICATION":"Color:Space Gray; ROM:64 GB; Battery:1810; Primary Camera:8",
+							   "PRODUCT_SUPPLIER_ID":"S101"},
+						   
+						   {"PRODUCT_ID":"1000",
+							"PRODUCT_NAME":"IPHONE 6",
+							"PRODUCT_CATEGORY":"MOBILE",
+							"PRODUCT_BRAND":"Lg",
+							"PRODUCT_COST":"16762.00",
+							"PRODUCT_QUANTITY":"5",
+							"PRODUCT_DISCOUNT":"10",
+							"PRODUCT_SELLINGPRICE":"599.00",
+							"PRODUCT_SPECIFICATION":"Color:Space Gray; ROM:32 GB; Battery:1810; Primary Camera:8",
+							"PRODUCT_SUPPLIER_ID":"S101"}
+		
+		];
+	
+	
+
+})
+
+app.filter('split', function() {
+        return function(input, splitChar, splitIndex) {
+            // do some bounds checking here to ensure it has that index
+            
+            return input.split(splitChar)[splitIndex];
+        }
+    });
+
+app.filter("customfilter",function(){
+	return function(moblist,bran,price,rom)
+	{
+		
+		if(bran[0]!=null || bran[1]!=null || bran[2]!=null|| price[0]!=null || price[1]!=null || price[2]!=null || rom[0]!=null || rom[1]!=null || rom[2]!=null)
+		{
+			 var result = [];  
+	         angular.forEach(moblist, function(item) {  
+	            			 var isFound = false;
+	             		 angular.forEach(item, function(term,key) {                         
+		                         	if(term != null &&  !isFound){
+		                            	var romtemp = term.split(';')[1];
+		                            	
+		                            	if(key =="PRODUCT_BRAND" && (term==bran[0]||term==bran[1]||term==bran[2]))
+		                            	{
+		                            		isFound = true
+		                            		result.push(item);
+		                            	}
+		                            	if(key =="PRODUCT_SELLINGPRICE" && (term==price[0]||term==price[1]||term==price[2]))
+		                            	{
+		                            		isFound=true;
+		                            		result.push(item);
+		                            	}
+		                            	if(key =="PRODUCT_SPECIFICATION" && (romtemp==rom[0]||romtemp==rom[1]||romtemp==rom[2]))
+		                            	{
+		                            		isFound=true;
+		                            		result.push(item);
+		                            	}
+	
+		                         	}
+	                     });
+	                });
+	    		return result;
+	
+		}
+		else
+		{
+			 return moblist
+		}
+
+	}
+})
+</script>
+</head>
+	<body ng-app="Application" ng-controller="myctrl">
+		<div class="container-fluid">
+			<div class ="row">
+			<div class="col-md-10">
+				<div class="form-group">
+				
+					<div ng-repeat="mobilemap in mobilemap">
+						<input ng-false-value="!'{{mobilemap.PRODUCT_BRAND}}'" ng-true-value="'{{mobilemap.PRODUCT_BRAND}}'"type="checkbox" ng-model="brand[$index]">{{mobilemap.PRODUCT_BRAND}}</input>
+						<input ng-false-value="!'{{mobilemap.PRODUCT_SELLINGPRICE}}'" ng-true-value="'{{mobilemap.PRODUCT_SELLINGPRICE}}'"type="checkbox" ng-model="price[$index]">{{mobilemap.PRODUCT_SELLINGPRICE}}</input>
+						<input ng-false-value="!'{{mobilemap.PRODUCT_SPECIFICATION | split :';':'1'}}'" ng-true-value="'{{mobilemap.PRODUCT_SPECIFICATION | split :';':'1'}}'"type="checkbox" ng-model="rom[$index]">{{mobilemap.PRODUCT_SPECIFICATION | split :';':'1'}}</input>
+					</div>
+					<h3 ng-show="brand">{{brand}}</h3>
+					<h3 ng-show="brand">{{price}}</h3>
+					<h3 ng-show="brand">{{rom}}</h3>
+				<table class="">
+					<tr>
+						<th>ID</th>
+						<th>NAME</th>
+						<th>CATEGORY</th>
+						<th>BRAND</th>
+						<th>COST</th>
+						<th>QUANTITY</th>
+						<th>DISCOUNT</th>
+						<th>SELLINGPRICE</th>
+						<th>SPECIFICATION</th>
+						<th>SUPPLIER_ID</th>
+					</tr>
+					
+		<!-- filter:{PRODUCT_BRAND: brand[0] , PRODUCT_BRAND: brand[1] } -->
+					
+					<tr ng-repeat="mobilemap in mobilemap |customfilter:brand:price:rom">
+						
+						<th>{{mobilemap.PRODUCT_ID}}</th>
+						<th>{{mobilemap.PRODUCT_NAME}}</th>
+						<th>{{mobilemap.PRODUCT_CATEGORY}}</th>
+						<th>{{mobilemap.PRODUCT_BRAND}}</th>
+						<th>{{mobilemap.PRODUCT_COST}}</th>
+						<th>{{mobilemap.PRODUCT_QUANTITY}}</th>
+						<th>{{mobilemap.PRODUCT_DISCOUNT}}</th>
+						<th>{{mobilemap.PRODUCT_SELLINGPRICE}}</th>
+						<th>{{mobilemap.SPECIFICATION}}</th>
+					</tr>
+					
+				
+				</table>
+					
+				</div>
+			
+			
+			</div>
+			</div>
+		</div>
+	
+	</body>
+</html>
